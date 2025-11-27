@@ -1,8 +1,10 @@
 from flask import Flask,jsonify, request
 import pandas as pd
 import joblib
+from flask_cors import CORS
 
 app = Flask(__name__)
+CORS(app)
 
 loaded_model = joblib.load("models/model_diabetes.pkl")
 
@@ -44,7 +46,7 @@ def predict():
             "status" : "Success",
             "message" : "Prediction"
         },
-        "data" : "Positive" if prediction.tolist()[0] == 1 else "Negative"
+        "data" : prediction.tolist()[0]
     })
 
 if __name__ == '__main__': 
