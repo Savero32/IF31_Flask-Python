@@ -31,7 +31,7 @@ def index():
         "data" : None
     })
 
-@app.route ('/api/predict', methods =["POST"])
+@app.route('/api/predict', methods =["POST"])
 def predict():
     data = request.get_json()
 
