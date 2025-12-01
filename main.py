@@ -39,6 +39,7 @@ def predict():
 
     X_input_scaled = loaded_scaler.transform(X_input)
 
+    
     prediction = loaded_model.predict(X_input_scaled)
 
     return jsonify({
