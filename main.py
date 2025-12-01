@@ -37,7 +37,7 @@ def predict():
 
     X_input = pd.DataFrame([data], columns=columns)
 
-    X_input_scaled = loaded_scaler.transform (X_input)
+    X_input_scaled = loaded_scaler.transform(X_input)
 
     prediction = loaded_model.predict(X_input_scaled)
 
