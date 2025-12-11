@@ -27,7 +27,7 @@ columns = [
     'Age'
 ]
 
-rps_class_names = ['Paper', 'Rock', 'Scissors']
+rps_class_names = [' ', 'Rock', 'Scissors']
 
 @app.route('/')
 def index():
