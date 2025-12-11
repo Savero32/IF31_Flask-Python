@@ -1,14 +1,21 @@
-from flask import Flask, jsonify, request
 import pandas as pd
 import joblib
+import numpy as np
+import tensorflow as tf
+import io
+
 from flask_cors import CORS
+from flask import Flask, request, jsonify
+
+from tensorflow.keras.preprocessing import image
+from tensorflow.keras.applications.mobilenet_v3 import preprocess_input
 
 app = Flask(__name__)
 CORS(app)
 
 loaded_model = joblib.load("models/model_diabetes.pkl")
 loaded_scaler = joblib.load("models/standard_scaler.pkl")
-
+loaded_model_rps = tf.keras.models.load_model("models/RPS.keras")
 columns = [
     'Pregnancies', 
     'Glucose', 
@@ -19,6 +26,8 @@ columns = [
     'DiabetesPedigreeFunction', 
     'Age'
 ]
+
+rps_class_names = ['Paper', 'Rock', 'Scissors']
 
 @app.route('/')
 def index():
@@ -43,6 +52,39 @@ def predict():
             "message": "Prediction"
         },
         "data": int(prediction[0])
+    })
+
+@app.route('/api/predict-rps', methods=["POST"])
+def predict_rps():
+    if 'file' not in request.files:
+        return jsonify({
+            "meta": {
+                "status": "400",
+                "message": "No file in the request"
+            }
+        })
+
+    file = request.files['file']
+    img_bytes = io.BytesIO(file.read())
+
+    img = image.load_img(img_bytes, target_size=(150, 150))
+    img_array = image.img_to_array(img)
+    img_array = preprocess_input(img_array)
+    img_batch = np.expand_dims(img_array, axis=0)
+
+    prediction = loaded_model_rps.predict(img_batch)
+    predicted_class_index = np.argmax(prediction)
+    print(img_batch)
+
+    return jsonify({
+        "meta": {
+            "status": "200",
+            "message": "Prediction sukses"
+        },
+        "data": {
+        "prediction" : rps_class_names[predicted_class_index],
+        "probability" : f"{np.max(prediction) * 100:.2f}%"
+        }
     })
 
 if __name__ == '__main__': 
